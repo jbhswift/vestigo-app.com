@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Get Vestigo on TestFlight.">
+  <title>Vestigo</title>
+  <link rel="icon" type="image/png" href="vestigo-app-icon.png">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; margin: 0; }
+    body {
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { display: flex; flex-direction: column; align-items: center; gap: 30px; }
+    img { display: block; width: min(58vw, 240px); height: auto; border-radius: 22.37%; }
+    a {
+      display: inline-flex;
+      min-height: 50px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 25px;
+      border-radius: 999px;
+      background: #fff;
+      color: #090909;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background-color 150ms ease, transform 150ms ease;
+    }
+    a:hover { background: #e7e7e7; transform: translateY(-1px); }
+    a:focus-visible { outline: 3px solid #9aeb9a; outline-offset: 4px; }
+    @media (prefers-reduced-motion: reduce) { a { transition: none; } }
+  </style>
+</head>
+<body>
+  <main aria-label="Vestigo">
+    <img src="vestigo-app-icon.png" alt="Vestigo app icon" width="1024" height="1024">
+    <a href="https://testflight.apple.com/join/zbvP2WEx">Download on TestFlight</a>
+  </main>
+</body>
+</html>
