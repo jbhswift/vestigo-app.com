@@ -32,47 +32,50 @@
     }
     .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
 
-    /* Tab bar — a top menu bar covering the app's own five tabs (Home, Search,
-       Watchlist, Collections, Friends), with Friends swapped for the
-       web-only Download tab since there's no account system here. */
+    /* Tab bar — a floating glass capsule at the top, mirroring the app's own
+       selectedGlassCapsule pattern (ViewModifiers.swift): an outer translucent
+       pill container with an inner pill highlight on the active tab, rather
+       than a flat full-width bar. */
     nav.tabs {
-      position: sticky;
+      position: fixed;
       top: 0;
+      left: 0;
+      right: 0;
       z-index: 10;
       display: flex;
       justify-content: center;
-      gap: 4px;
-      padding: 10px max(12px, env(safe-area-inset-left));
-      background: rgba(10, 10, 14, 0.82);
-      border-bottom: 1px solid var(--glass-stroke);
+      padding: 12px 0;
+    }
+    .tab-bar {
+      display: inline-flex;
+      gap: 2px;
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-stroke);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
+      max-width: 100%;
       overflow-x: auto;
     }
     .tab-btn {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 2px;
       border: none;
       background: transparent;
-      color: var(--text-tertiary);
-      font-size: 13px;
+      color: var(--text-secondary);
+      font-size: 10.5px;
       font-weight: 600;
       padding: 8px 14px;
-      border-radius: var(--radius-pill);
+      border-radius: calc(var(--radius-pill) - 4px);
       cursor: pointer;
-      transition: color 200ms ease, background-color 200ms ease;
+      transition: background-color 200ms ease, color 200ms ease;
       white-space: nowrap;
     }
-    .tab-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
-    .tab-btn.active { color: var(--accent); background: rgba(10, 132, 255, 0.14); }
-
-    /* Icon-only on narrow phones — five icon+label pairs don't fit under ~430px. */
-    @media (max-width: 430px) {
-      nav.tabs { gap: 2px; padding: 8px max(6px, env(safe-area-inset-left)); }
-      .tab-btn { padding: 8px 12px; }
-      .tab-btn .label { display: none; }
-    }
+    .tab-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .tab-btn.active { background: rgba(255, 255, 255, 0.18); color: var(--text); }
 
     section.panel { display: none; }
     section.panel.active { display: block; }
@@ -108,15 +111,66 @@
     .panel-intro h1 { font-size: 26px; margin: 0 0 8px; }
     .panel-intro p { color: var(--text-secondary); margin: 0 auto; max-width: 440px; }
 
-    .download-panel {
+    #panel-download .hero { padding-bottom: 8px; }
+
+    /* Horizontally-scrolling rows of real, live TMDb data — see assets/live-data.js.
+       Each card links to /media/, the same landing page shared media links use. */
+    .media-row {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 22px;
-      padding: 44px 0 24px;
+      gap: 14px;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+      /* Full-bleed: break out of .wrap's centered 720px column on wide
+         screens so the row uses the whole viewport width, while padding
+         keeps the first card aligned with the text above it. */
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      padding: 4px max(24px, calc((100vw - var(--max-width)) / 2 + 24px)) 10px;
     }
-    .download-panel .glass { padding: 28px 24px; width: 100%; max-width: 420px; }
+    .media-card {
+      flex: 0 0 auto;
+      width: 120px;
+      scroll-snap-align: start;
+    }
+    .media-card-poster {
+      width: 120px;
+      height: 180px;
+      border-radius: 18%;
+      background: var(--glass-fill);
+      overflow: hidden;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+    }
+    .media-card-poster img { width: 100%; height: 100%; object-fit: cover; }
+    .media-card-title {
+      margin-top: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .media-card-meta { margin-top: 2px; font-size: 11px; color: var(--text-tertiary); }
+    .row-loading, .row-error { padding: 8px 2px; }
+
+    .search-box {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 28px;
+    }
+    .search-box input {
+      flex: 1;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--glass-stroke);
+      background: var(--glass-fill);
+      color: var(--text);
+      font-size: 15px;
+    }
+    .search-box input::placeholder { color: var(--text-tertiary); }
+    .search-box input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
     /* About — mirrors AboutInfoView.swift's Settings > About tab. */
     .about-section {
@@ -156,27 +210,29 @@
   </style>
 </head>
 <body>
-  <nav class="tabs" role="tablist" aria-label="Vestigo site sections">
-    <button class="tab-btn active" data-panel="home" role="tab" aria-selected="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5A1 1 0 0 0 6.5 20.5h11a1 1 0 0 0 1-1V10"/></svg>
-      <span class="label">Home</span>
-    </button>
-    <button class="tab-btn" data-panel="search" role="tab" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg>
-      <span class="label">Search</span>
-    </button>
-    <button class="tab-btn" data-panel="watchlist" role="tab" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg>
-      <span class="label">Watchlist</span>
-    </button>
-    <button class="tab-btn" data-panel="collections" role="tab" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="13" height="9" rx="2"/><path d="M7.5 17.5h13a2 2 0 0 0 2-2V8"/></svg>
-      <span class="label">Collections</span>
-    </button>
-    <button class="tab-btn" data-panel="download" role="tab" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 17.5v2A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5v-2"/></svg>
-      <span class="label">Download</span>
-    </button>
+  <nav class="tabs">
+    <div class="tab-bar" role="tablist" aria-label="Vestigo site sections">
+      <button class="tab-btn active" data-panel="home" role="tab" aria-selected="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5A1 1 0 0 0 6.5 20.5h11a1 1 0 0 0 1-1V10"/></svg>
+        <span class="label">Home</span>
+      </button>
+      <button class="tab-btn" data-panel="search" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg>
+        <span class="label">Search</span>
+      </button>
+      <button class="tab-btn" data-panel="watchlist" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg>
+        <span class="label">Watchlist</span>
+      </button>
+      <button class="tab-btn" data-panel="collections" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="13" height="9" rx="2"/><path d="M7.5 17.5h13a2 2 0 0 0 2-2V8"/></svg>
+        <span class="label">Collections</span>
+      </button>
+      <button class="tab-btn" data-panel="download" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 17.5v2A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5v-2"/></svg>
+        <span class="label">Download</span>
+      </button>
+    </div>
   </nav>
 
   <main class="wrap">
@@ -185,10 +241,12 @@
         <img src="vestigo-app-icon.png" alt="Vestigo app icon" class="app-icon" width="1024" height="1024">
         <h1 class="title">Vestigo</h1>
         <p class="tagline">A personal movie and TV tracker for iOS. Discover what to watch next, track what you've seen, and get recommendations that reflect your history.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="https://testflight.apple.com/join/zbvP2WEx" target="_blank" rel="noopener noreferrer">Download on TestFlight</a>
-        </div>
       </header>
+
+      <div class="feature-group fade-in">
+        <h2>Trending this week</h2>
+        <div class="media-row" id="row-trending"><p class="small row-loading">Loading live data…</p></div>
+      </div>
 
       <div class="feature-group fade-in">
         <h2>Discovery</h2>
@@ -212,9 +270,10 @@
         <p>Find exactly what you're in the mood for.</p>
       </div>
       <div class="feature-group fade-in">
-        <div class="glass feature-card"><p><strong>Find anything</strong> — search titles or people by name.</p></div>
-        <div class="glass feature-card"><p><strong>Genre browsing</strong> — collections for every genre and franchise, right from the empty state.</p></div>
-        <div class="glass feature-card"><p><strong>Filters</strong> — narrow results by runtime, release date, and minimum rating.</p></div>
+        <form class="search-box" id="search-form">
+          <input type="search" id="search-input" placeholder="Search movies and TV shows" autocomplete="off">
+        </form>
+        <div class="media-row" id="search-results"></div>
       </div>
     </section>
 
@@ -222,13 +281,11 @@
       <div class="panel-intro fade-in">
         <div class="icon-badge glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg></div>
         <h1>Watchlist</h1>
-        <p>Everything you've saved, and everything you've seen.</p>
+        <p>Everything you save shows up here — ratings, watched dates, and episode progress included. Here's what's coming up that's worth adding to yours:</p>
       </div>
       <div class="feature-group fade-in">
-        <div class="glass feature-card"><p><strong>Watched &amp; watchlist</strong> — mark movies and series as watched or save them for later.</p></div>
-        <div class="glass feature-card"><p><strong>Ratings</strong> — rate what you've seen from 1–5, with half-star increments.</p></div>
-        <div class="glass feature-card"><p><strong>Episode progress</strong> — track season and episode progress for TV series.</p></div>
-        <div class="glass feature-card"><p><strong>Not interested</strong> — hide items you don't want to see again.</p></div>
+        <h2>Upcoming releases</h2>
+        <div class="media-row" id="row-upcoming"><p class="small row-loading">Loading live data…</p></div>
       </div>
     </section>
 
@@ -236,24 +293,24 @@
       <div class="panel-intro fade-in">
         <div class="icon-badge glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="13" height="9" rx="2"/><path d="M7.5 17.5h13a2 2 0 0 0 2-2V8"/></svg></div>
         <h1>Collections</h1>
-        <p>Organize your library, your way — or let Vestigo do it.</p>
+        <p>Organize your library, your way — or let Vestigo group it automatically by franchise. Here's what's popular right now:</p>
       </div>
       <div class="feature-group fade-in">
-        <div class="glass feature-card"><p><strong>Custom collections</strong> — group titles any way you like.</p></div>
-        <div class="glass feature-card"><p><strong>Automatic grouping</strong> — franchise and series collections are suggested automatically as you log more titles.</p></div>
+        <h2>Popular movies</h2>
+        <div class="media-row" id="row-popular"><p class="small row-loading">Loading live data…</p></div>
       </div>
     </section>
 
     <section id="panel-download" class="panel">
-      <div class="download-panel fade-in">
+      <header class="hero fade-in">
         <img src="vestigo-app-icon.png" alt="Vestigo app icon" class="app-icon" width="1024" height="1024">
-        <h1 class="title">Get Vestigo</h1>
-        <div class="glass">
-          <p class="sub" style="margin: 0 0 16px;">Vestigo is currently distributed through TestFlight while it's in beta.</p>
-          <a class="btn btn-primary btn-block" href="https://testflight.apple.com/join/zbvP2WEx" target="_blank" rel="noopener noreferrer">Download on TestFlight</a>
+        <h1 class="title">Vestigo</h1>
+        <p class="tagline">A personal movie and TV tracker for iOS. Discover what to watch next, track what you've seen, and get recommendations that reflect your history.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://testflight.apple.com/join/zbvP2WEx" target="_blank" rel="noopener noreferrer">Download on TestFlight</a>
         </div>
         <p class="small">iOS 26.0 or later required.</p>
-      </div>
+      </header>
 
       <div class="about-section fade-in">
         <h2>About</h2>
@@ -304,6 +361,7 @@
   </main>
 
   <script src="assets/site.js"></script>
+  <script src="assets/live-data.js"></script>
   <script>
     document.querySelectorAll(".tab-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -322,6 +380,7 @@
         window.scrollTo({ top: 0, behavior: "instant" });
         history.replaceState(null, "", target === "home" ? "#" : `#${target}`);
         initFadeInOnScroll();
+        loadDataForPanel(target);
       });
     });
 
@@ -330,6 +389,16 @@
     if (initialBtn && initialTab !== "home") initialBtn.click();
 
     initFadeInOnScroll();
+    initSearchBox();
+    loadDataForPanel(initialTab);
+
+    // nav.tabs is fixed, so it doesn't reserve space in flow — measure it and
+    // push content down by exactly that much, keeping it in sync on resize.
+    function syncNavOffset() {
+      document.body.style.paddingTop = document.querySelector("nav.tabs").offsetHeight + "px";
+    }
+    syncNavOffset();
+    window.addEventListener("resize", syncNavOffset);
   </script>
 </body>
 </html>
