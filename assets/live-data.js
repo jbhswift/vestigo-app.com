@@ -4,6 +4,15 @@
 
 const TMDB_BACKEND = "https://mtttuyvpjyugudkevchj.supabase.co/functions/v1/vestigo-api";
 const POSTER_BASE = "https://image.tmdb.org/t/p/w185";
+const CARD_WIDTH = 120;
+const CARD_GAP = 14;
+const DESKTOP_BREAKPOINT = 700;
+const MOBILE_ROW_LIMIT = 12;
+const EXPANDED_ROW_LIMIT = 24;
+
+// Cache of fetched items per row, so the chevron can expand/collapse without
+// re-fetching, and so a window resize can re-fit the collapsed row.
+const rowState = {};
 
 function escapeHTML(value) {
   return value.replace(/[&<>"']/g, (c) => ({
@@ -37,24 +46,82 @@ async function fetchTMDbList(path, extraQuery = "") {
   return data.results ?? [];
 }
 
-async function loadRow(containerId, path, fallbackKind) {
+// How many cards fit in the row's own width with no horizontal scroll —
+// sideways scrolling is fine on a touch device, awkward with a mouse.
+function computeFitCount(el) {
+  const style = getComputedStyle(el);
+  const available = el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  return Math.max(1, Math.floor((available + CARD_GAP) / (CARD_WIDTH + CARD_GAP)));
+}
+
+function renderRow(containerId) {
+  const state = rowState[containerId];
   const el = document.getElementById(containerId);
-  if (!el || el.dataset.loaded) return;
-  el.dataset.loaded = "pending";
+  if (!state || !el) return;
+
+  const isDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
+  let visible = state.items;
+
+  if (state.expanded) {
+    visible = state.items.slice(0, EXPANDED_ROW_LIMIT);
+  } else if (isDesktop) {
+    visible = state.items.slice(0, computeFitCount(el));
+  } else {
+    visible = state.items.slice(0, MOBILE_ROW_LIMIT);
+  }
+
+  el.classList.toggle("media-row-wrap", state.expanded);
+  el.classList.toggle("media-row-center", !state.expanded && isDesktop);
+  el.innerHTML = visible.length
+    ? visible.map((item) => mediaCardHTML(item, state.fallbackKind)).join("")
+    : `<p class="small row-error">Nothing to show right now.</p>`;
+
+  const header = document.querySelector(`.section-header[data-row="${containerId}"]`);
+  if (header) header.classList.toggle("expanded", state.expanded);
+}
+
+async function loadRow(containerId, path, fallbackKind) {
+  if (rowState[containerId]) return;
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  rowState[containerId] = { items: [], fallbackKind, expanded: false, path };
   try {
-    const items = (await fetchTMDbList(path))
-      .filter((item) => item.media_type !== "person")
-      .slice(0, 12);
-    el.innerHTML = items.length
-      ? items.map((item) => mediaCardHTML(item, fallbackKind)).join("")
-      : `<p class="small row-error">Nothing to show right now.</p>`;
-    el.dataset.loaded = "true";
+    const items = (await fetchTMDbList(path)).filter((item) => item.media_type !== "person");
+    rowState[containerId].items = items;
+    renderRow(containerId);
   } catch (err) {
     console.warn(`Couldn't load ${path}:`, err);
+    delete rowState[containerId];
     el.innerHTML = `<p class="small row-error">Couldn't load live data right now.</p>`;
-    el.dataset.loaded = "";
   }
 }
+
+function toggleRowExpanded(containerId) {
+  const state = rowState[containerId];
+  if (!state) return;
+  state.expanded = !state.expanded;
+  renderRow(containerId);
+}
+
+function initSectionHeaders() {
+  document.querySelectorAll(".section-header").forEach((header) => {
+    const rowId = header.dataset.row;
+    header.addEventListener("click", () => toggleRowExpanded(rowId));
+    header.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleRowExpanded(rowId);
+      }
+    });
+  });
+}
+
+// Re-fit every collapsed desktop row when the window resizes.
+window.addEventListener("resize", () => {
+  Object.keys(rowState).forEach((containerId) => {
+    if (!rowState[containerId].expanded) renderRow(containerId);
+  });
+});
 
 let searchDebounce;
 async function runSearch(query) {

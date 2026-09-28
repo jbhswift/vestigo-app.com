@@ -23,31 +23,27 @@
 html, body {
   margin: 0;
   min-height: 100%;
-}
-
-body {
-  min-height: 100svh;
-  position: relative;
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  background: #000;
+  /* Prevents mobile Safari's rubber-band overscroll from revealing plain
+     black past the top/bottom edges when the dynamic toolbar shows/hides. */
+  overscroll-behavior-y: none;
 }
 
 /* Matches AppBackground in Vestigo/Views/BaseScreen.swift: a top-left→bottom-right
    gradient from the accent color into near-black, plus three soft accent-colored
-   glow blobs. Fixed so it reads the same while scrolling, like the app's backdrop. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
+   glow blobs. This is body's own background (not a separate fixed layer) so
+   it always exactly covers body's box — no viewport-tracking edge cases. */
+body {
+  min-height: 100svh;
   background:
     radial-gradient(circle 480px at 8% 0%, rgba(10, 132, 255, 0.24) 0%, rgba(10, 132, 255, 0.10) 45%, transparent 100%),
     radial-gradient(circle 480px at 100% 26%, rgba(10, 132, 255, 0.16) 0%, rgba(10, 132, 255, 0.07) 45%, transparent 100%),
     radial-gradient(circle 540px at 62% 72%, rgba(10, 132, 255, 0.12) 0%, rgba(10, 132, 255, 0.05) 45%, transparent 100%),
     linear-gradient(135deg, rgba(10, 132, 255, 0.18), rgb(10, 11, 19));
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 img { display: block; max-width: 100%; height: auto; }
