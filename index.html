@@ -4,46 +4,269 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#000000">
-  <meta name="description" content="Get Vestigo on TestFlight.">
-  <title>Vestigo</title>
+  <meta name="description" content="Vestigo — a personal movie and TV tracker for iOS. Discover what to watch next, track what you've seen, and get recommendations that reflect your history.">
+  <title>Vestigo — Track what you watch</title>
   <link rel="icon" type="image/png" href="vestigo-app-icon.png">
+  <link rel="stylesheet" href="assets/site.css">
+  <noscript><style>.fade-in { opacity: 1 !important; transform: none !important; }</style></noscript>
   <style>
-    * { box-sizing: border-box; }
-    html, body { min-height: 100%; margin: 0; }
-    body {
-      min-height: 100svh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      background: #000;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    header.hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 18px;
+      padding: 40px 0 36px;
     }
-    main { display: flex; flex-direction: column; align-items: center; gap: 30px; }
-    img { display: block; width: min(58vw, 240px); height: auto; border-radius: 22.37%; }
-    a {
+    h1.title {
+      font-size: clamp(28px, 6vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+    p.tagline {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 480px;
+      margin: 0;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+
+    /* Tab nav — mirrors the app's own five-tab TabView (Home, Search,
+       Watchlist, Collections, Friends), with Friends swapped for the
+       web-only Download tab since there's no account system here. */
+    nav.tabs {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      padding: 12px 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.97), rgba(0,0,0,0.8) 70%, transparent);
+    }
+    .tab-bar {
       display: inline-flex;
-      min-height: 50px;
+      gap: 2px;
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-stroke);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      max-width: 100%;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: calc(var(--radius-pill) - 4px);
+      cursor: pointer;
+      transition: background-color 200ms ease, color 200ms ease;
+      white-space: nowrap;
+    }
+    .tab-btn svg { width: 20px; height: 20px; }
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.18);
+      color: var(--text);
+    }
+
+    section.panel { display: none; }
+    section.panel.active { display: block; }
+
+    .feature-group { margin: 36px 0; }
+    .feature-group h2 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin: 0 0 14px;
+    }
+    .feature-card {
+      padding: 18px 20px;
+      margin-bottom: 10px;
+    }
+    .feature-card p { margin: 0; color: var(--text-secondary); font-size: 15px; line-height: 1.45; }
+    .feature-card strong { color: var(--text); font-weight: 600; }
+
+    .panel-intro { text-align: center; padding: 44px 0 8px; }
+    .panel-intro .icon-badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 25px;
-      border-radius: 999px;
-      background: #fff;
-      color: #090909;
-      font-size: 16px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: background-color 150ms ease, transform 150ms ease;
+      margin: 0 auto 16px;
+      color: var(--accent);
     }
-    a:hover { background: #e7e7e7; transform: translateY(-1px); }
-    a:focus-visible { outline: 3px solid #9aeb9a; outline-offset: 4px; }
-    @media (prefers-reduced-motion: reduce) { a { transition: none; } }
+    .panel-intro .icon-badge svg { width: 28px; height: 28px; }
+    .panel-intro h1 { font-size: 26px; margin: 0 0 8px; }
+    .panel-intro p { color: var(--text-secondary); margin: 0 auto; max-width: 440px; }
+
+    .download-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 22px;
+      padding: 44px 0 80px;
+    }
+    .download-panel .glass { padding: 28px 24px; width: 100%; max-width: 420px; }
+
+    footer {
+      text-align: center;
+      padding: 40px 0 60px;
+      color: var(--text-tertiary);
+      font-size: 13px;
+    }
+    footer a { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <main aria-label="Vestigo">
-    <img src="vestigo-app-icon.png" alt="Vestigo app icon" width="1024" height="1024">
-    <a href="https://testflight.apple.com/join/zbvP2WEx" target="_blank" rel="noopener noreferrer">Download on TestFlight</a>
+  <nav class="tabs">
+    <div class="tab-bar" role="tablist" aria-label="Vestigo site sections">
+      <button class="tab-btn active" data-panel="home" role="tab" aria-selected="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5A1 1 0 0 0 6.5 20.5h11a1 1 0 0 0 1-1V10"/></svg>
+        Home
+      </button>
+      <button class="tab-btn" data-panel="search" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg>
+        Search
+      </button>
+      <button class="tab-btn" data-panel="watchlist" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg>
+        Watchlist
+      </button>
+      <button class="tab-btn" data-panel="collections" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="13" height="9" rx="2"/><path d="M7.5 17.5h13a2 2 0 0 0 2-2V8"/></svg>
+        Collections
+      </button>
+      <button class="tab-btn" data-panel="download" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 17.5v2A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5v-2"/></svg>
+        Download
+      </button>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section id="panel-home" class="panel active">
+      <header class="hero fade-in">
+        <img src="vestigo-app-icon.png" alt="Vestigo app icon" class="app-icon" width="1024" height="1024">
+        <h1 class="title">Vestigo</h1>
+        <p class="tagline">A personal movie and TV tracker for iOS. Discover what to watch next, track what you've seen, and get recommendations that reflect your history.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://testflight.apple.com/join/zbvP2WEx" target="_blank" rel="noopener noreferrer">Download on TestFlight</a>
+        </div>
+      </header>
+
+      <div class="feature-group fade-in">
+        <h2>Discovery</h2>
+        <div class="glass feature-card"><p><strong>Trending &amp; upcoming</strong> — trending, popular, new releases, and upcoming titles.</p></div>
+        <div class="glass feature-card"><p><strong>For You</strong> — personalized recommendations based on your watch history and ratings.</p></div>
+        <div class="glass feature-card"><p><strong>Pick For Me</strong> — answer a few questions and get results tailored to your mood, powered by TMDb and a unique archetype system.</p></div>
+      </div>
+
+      <div class="feature-group fade-in">
+        <h2>On every title</h2>
+        <div class="glass feature-card"><p><strong>Cast &amp; crew</strong> — full credits with person profiles and filmographies.</p></div>
+        <div class="glass feature-card"><p><strong>Streaming availability</strong> — prices and direct links to streaming apps where available.</p></div>
+        <div class="glass feature-card"><p><strong>Trailers</strong> — watch trailers without leaving the app.</p></div>
+      </div>
+    </section>
+
+    <section id="panel-search" class="panel">
+      <div class="panel-intro fade-in">
+        <div class="icon-badge glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg></div>
+        <h1>Search</h1>
+        <p>Find exactly what you're in the mood for.</p>
+      </div>
+      <div class="feature-group fade-in">
+        <div class="glass feature-card"><p><strong>Find anything</strong> — search titles or people by name.</p></div>
+        <div class="glass feature-card"><p><strong>Genre browsing</strong> — collections for every genre and franchise, right from the empty state.</p></div>
+        <div class="glass feature-card"><p><strong>Filters</strong> — narrow results by runtime, release date, and minimum rating.</p></div>
+      </div>
+    </section>
+
+    <section id="panel-watchlist" class="panel">
+      <div class="panel-intro fade-in">
+        <div class="icon-badge glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg></div>
+        <h1>Watchlist</h1>
+        <p>Everything you've saved, and everything you've seen.</p>
+      </div>
+      <div class="feature-group fade-in">
+        <div class="glass feature-card"><p><strong>Watched &amp; watchlist</strong> — mark movies and series as watched or save them for later.</p></div>
+        <div class="glass feature-card"><p><strong>Ratings</strong> — rate what you've seen from 1–5, with half-star increments.</p></div>
+        <div class="glass feature-card"><p><strong>Episode progress</strong> — track season and episode progress for TV series.</p></div>
+        <div class="glass feature-card"><p><strong>Not interested</strong> — hide items you don't want to see again.</p></div>
+      </div>
+    </section>
+
+    <section id="panel-collections" class="panel">
+      <div class="panel-intro fade-in">
+        <div class="icon-badge glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="13" height="9" rx="2"/><path d="M7.5 17.5h13a2 2 0 0 0 2-2V8"/></svg></div>
+        <h1>Collections</h1>
+        <p>Organize your library, your way — or let Vestigo do it.</p>
+      </div>
+      <div class="feature-group fade-in">
+        <div class="glass feature-card"><p><strong>Custom collections</strong> — group titles any way you like.</p></div>
+        <div class="glass feature-card"><p><strong>Automatic grouping</strong> — franchise and series collections are suggested automatically as you log more titles.</p></div>
+      </div>
+    </section>
+
+    <section id="panel-download" class="panel">
+      <div class="download-panel fade-in">
+        <img src="vestigo-app-icon.png" alt="Vestigo app icon" class="app-icon" width="1024" height="1024">
+        <h1 class="title">Get Vestigo</h1>
+        <div class="glass">
+          <p class="sub" style="margin: 0 0 16px;">Vestigo is currently distributed through TestFlight while it's in beta.</p>
+          <a class="btn btn-primary btn-block" href="https://testflight.apple.com/join/zbvP2WEx" target="_blank" rel="noopener noreferrer">Download on TestFlight</a>
+        </div>
+        <p class="small">iOS 26.0 or later required.</p>
+        <p class="small">Friends, watchlists, and collections all live in the app itself — no account or website login needed. Add friends via invite link or QR code once you're in.</p>
+      </div>
+    </section>
   </main>
+
+  <footer>
+    Vestigo is a personal project. <a href="https://github.com/jbhswift/Vestigo" target="_blank" rel="noopener noreferrer">View source on GitHub</a>.
+  </footer>
+
+  <script src="assets/site.js"></script>
+  <script>
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach((b) => {
+          b.classList.remove("active");
+          b.setAttribute("aria-selected", "false");
+        });
+        btn.classList.add("active");
+        btn.setAttribute("aria-selected", "true");
+
+        const target = btn.dataset.panel;
+        document.querySelectorAll(".panel").forEach((panel) => {
+          panel.classList.toggle("active", panel.id === `panel-${target}`);
+        });
+
+        window.scrollTo({ top: 0, behavior: "instant" });
+        history.replaceState(null, "", target === "home" ? "#" : `#${target}`);
+        initFadeInOnScroll();
+      });
+    });
+
+    const initialTab = location.hash.replace("#", "") || "home";
+    const initialBtn = document.querySelector(`.tab-btn[data-panel="${initialTab}"]`);
+    if (initialBtn && initialTab !== "home") initialBtn.click();
+
+    initFadeInOnScroll();
+  </script>
 </body>
 </html>

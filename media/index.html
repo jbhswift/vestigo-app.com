@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Check this out on Vestigo.">
+  <title>Vestigo</title>
+  <link rel="icon" type="image/png" href="../vestigo-app-icon.png">
+  <link rel="stylesheet" href="../assets/site.css">
+  <meta name="appleid-signin-client-id" content="com.jojovestigo.web">
+  <meta name="appleid-signin-scope" content="name">
+  <meta name="appleid-signin-redirect-uri" content="https://vestigo-app.com/media">
+  <meta name="appleid-signin-use-popup" content="true">
+  <style>
+    main.card-page {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      gap: 22px;
+    }
+    .poster {
+      width: min(52vw, 220px);
+      aspect-ratio: 2 / 3;
+      border-radius: 18%; /* mirrors PosterViews' width * 0.18 corner radius */
+      object-fit: cover;
+      background: var(--glass-fill);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+    }
+    .glass.media-card {
+      width: 100%;
+      max-width: 440px;
+      padding: 28px 26px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    h1.title { font-size: 24px; font-weight: 800; margin: 0; line-height: 1.2; }
+    .meta { color: var(--text-tertiary); font-size: 14px; }
+    .overview {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.5;
+      max-height: 6.5em;
+      overflow: hidden;
+    }
+    .actions { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 4px; }
+    .divider { display: flex; align-items: center; gap: 10px; color: var(--text-tertiary); font-size: 13px; width: 100%; }
+    .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--glass-stroke); }
+    #apple-signin { display: flex; justify-content: center; }
+    .skeleton { opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <main class="card-page">
+    <img class="poster skeleton" id="poster" alt="" src="../vestigo-app-icon.png">
+    <div class="glass media-card fade-in is-visible">
+      <h1 class="title" id="media-title">Loading…</h1>
+      <p class="meta" id="media-meta"></p>
+      <p class="overview" id="media-overview"></p>
+
+      <div class="actions">
+        <button class="btn btn-primary btn-block" id="open-app-btn">Open in Vestigo</button>
+        <div class="divider">or</div>
+        <a class="btn btn-glass btn-block" href="https://testflight.apple.com/join/zbvP2WEx" target="_blank" rel="noopener noreferrer">Get Vestigo on TestFlight</a>
+      </div>
+
+      <div class="divider">optional</div>
+      <div id="apple-signin" data-color="white" data-border="true" data-type="continue"></div>
+      <p class="small">Signing in with Apple isn't required — it just confirms it's you before opening the app. Vestigo itself doesn't use accounts.</p>
+    </div>
+  </main>
+
+  <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" async></script>
+  <script src="../assets/site.js"></script>
+  <script>
+    const BACKEND_BASE = "https://mtttuyvpjyugudkevchj.supabase.co/functions/v1/vestigo-api";
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const kind = params.get("kind") === "tv" ? "tv" : "movie";
+
+    function deepLinkURL() {
+      return `vestigo://media?id=${encodeURIComponent(id ?? "")}&kind=${encodeURIComponent(kind)}`;
+    }
+
+    async function loadMedia() {
+      if (!id || !/^\d+$/.test(id)) {
+        document.getElementById("media-title").textContent = "Vestigo";
+        document.getElementById("media-meta").textContent = "";
+        return;
+      }
+      try {
+        const url = `${BACKEND_BASE}/tmdb-proxy?path=${encodeURIComponent(`/${kind}/${id}`)}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+
+        const title = data.title ?? data.name ?? "Untitled";
+        const releaseDate = data.release_date ?? data.first_air_date ?? "";
+        const year = releaseDate ? releaseDate.slice(0, 4) : null;
+        const rating = typeof data.vote_average === "number" ? data.vote_average.toFixed(1) : null;
+
+        document.getElementById("media-title").textContent = title;
+        document.title = `${title} — Vestigo`;
+        document.getElementById("media-meta").textContent = [
+          kind === "tv" ? "TV Series" : "Movie",
+          year,
+          rating ? `★ ${rating}` : null,
+        ].filter(Boolean).join(" · ");
+        document.getElementById("media-overview").textContent = data.overview ?? "";
+
+        if (data.poster_path) {
+          const poster = document.getElementById("poster");
+          poster.src = `https://image.tmdb.org/t/p/w342${data.poster_path}`;
+          poster.alt = title;
+          poster.classList.remove("skeleton");
+        }
+      } catch (err) {
+        console.warn("Couldn't load media details:", err);
+        document.getElementById("media-title").textContent = "Check this out on Vestigo";
+      }
+    }
+
+    document.getElementById("open-app-btn").addEventListener("click", () => {
+      openInVestigo(deepLinkURL());
+    });
+
+    openInVestigo(deepLinkURL());
+
+    initAppleSignIn({
+      onIdentity: () => {
+        openInVestigo(deepLinkURL());
+      },
+    });
+
+    loadMedia();
+    initFadeInOnScroll();
+  </script>
+</body>
+</html>

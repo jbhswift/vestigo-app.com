@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Add a friend on Vestigo.">
+  <title>Add me on Vestigo</title>
+  <link rel="icon" type="image/png" href="../vestigo-app-icon.png">
+  <link rel="stylesheet" href="../assets/site.css">
+  <meta name="appleid-signin-client-id" content="com.jojovestigo.web">
+  <meta name="appleid-signin-scope" content="name">
+  <meta name="appleid-signin-redirect-uri" content="https://vestigo-app.com/friend">
+  <meta name="appleid-signin-use-popup" content="true">
+  <style>
+    main.card-page {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      gap: 22px;
+    }
+    .glass.invite-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    h1.title { font-size: 26px; font-weight: 800; margin: 0; }
+    .actions { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 8px; }
+    .divider { display: flex; align-items: center; gap: 10px; color: var(--text-tertiary); font-size: 13px; width: 100%; }
+    .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--glass-stroke); }
+    #apple-signin { display: flex; justify-content: center; }
+  </style>
+</head>
+<body>
+  <main class="card-page">
+    <img src="../vestigo-app-icon.png" alt="Vestigo" class="app-icon" width="1024" height="1024" style="width: 84px;">
+    <div class="glass invite-card fade-in is-visible">
+      <h1 class="title" id="heading">Add me on Vestigo</h1>
+      <p class="sub" id="subtitle">No account needed — tap below and Vestigo will add you as a friend automatically.</p>
+
+      <div class="actions">
+        <button class="btn btn-primary btn-block" id="open-app-btn">Open in Vestigo</button>
+        <div class="divider">or</div>
+        <a class="btn btn-glass btn-block" href="https://testflight.apple.com/join/zbvP2WEx" target="_blank" rel="noopener noreferrer">Get Vestigo on TestFlight</a>
+      </div>
+
+      <div class="divider">optional</div>
+      <div id="apple-signin" data-color="white" data-border="true" data-type="continue"></div>
+      <p class="small">Signing in with Apple isn't required — it just confirms it's you before opening the app. Vestigo itself doesn't use accounts.</p>
+    </div>
+  </main>
+
+  <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" async></script>
+  <script src="../assets/site.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const inviterName = params.get("name");
+    if (inviterName) {
+      document.getElementById("heading").textContent = `${inviterName} wants to add you on Vestigo`;
+      document.getElementById("subtitle").textContent = "No account needed — tap below and you'll both be added as friends automatically.";
+    }
+
+    function deepLinkURL() {
+      return "vestigo://friend" + window.location.search;
+    }
+
+    document.getElementById("open-app-btn").addEventListener("click", () => {
+      openInVestigo(deepLinkURL());
+    });
+
+    // If the app is installed, iOS intercepts the universal link tap itself —
+    // this page only ever renders when it isn't, so also try the custom
+    // scheme once automatically in case the AASA hasn't been (re)verified yet.
+    openInVestigo(deepLinkURL());
+
+    initAppleSignIn({
+      onIdentity: ({ givenName }) => {
+        if (givenName) {
+          document.getElementById("heading").textContent = `Welcome, ${givenName}`;
+        }
+        openInVestigo(deepLinkURL());
+      },
+    });
+
+    initFadeInOnScroll();
+  </script>
+</body>
+</html>
