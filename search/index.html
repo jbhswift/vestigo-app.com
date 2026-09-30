@@ -4,13 +4,30 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=5">
   <meta name="theme-color" content="#000000">
-  <meta name="description" content="Vestigo — a personal movie and TV tracker for iOS. Discover what to watch next, track what you've seen, and get recommendations that reflect your history.">
-  <title>Vestigo — Track what you watch</title>
-  <link rel="icon" type="image/png" href="vestigo-app-icon.png">
-  <link rel="stylesheet" href="assets/site.css">
+  <meta name="description" content="Search movies and TV shows on Vestigo.">
+  <title>Search — Vestigo</title>
+  <link rel="icon" type="image/png" href="../vestigo-app-icon.png">
+  <link rel="stylesheet" href="../assets/site.css">
   <noscript><style>.fade-in { opacity: 1 !important; transform: none !important; }</style></noscript>
   <style>
-    main.wrap { padding-top: 24px; padding-bottom: 40px; }
+    main.wrap { padding-bottom: 40px; }
+    .search-box {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 28px;
+    }
+    .search-box input {
+      flex: 1;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--glass-stroke);
+      background: var(--glass-fill);
+      color: var(--text);
+      font-size: 15px;
+    }
+    .search-box input::placeholder { color: var(--text-tertiary); }
+    .search-box input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
   </style>
 </head>
 <body>
@@ -44,41 +61,26 @@
   </nav>
 
   <main class="wrap">
-    <div class="feature-group fade-in">
-      <div class="section-header" data-row="row-trending" role="button" tabindex="0">
-        <h2>Trending now</h2>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
-      <div class="media-row" id="row-trending"><p class="small row-loading">Loading live data…</p></div>
+    <div class="panel-intro fade-in">
+      <div class="icon-badge glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg></div>
+      <h1>Search</h1>
+      <p>Find exactly what you're in the mood for.</p>
     </div>
-
     <div class="feature-group fade-in">
-      <div class="section-header" data-row="row-new-releases" role="button" tabindex="0">
-        <h2>New releases</h2>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
-      <div class="media-row" id="row-new-releases"><p class="small row-loading">Loading live data…</p></div>
-    </div>
-
-    <div class="feature-group fade-in">
-      <div class="section-header" data-row="row-upcoming" role="button" tabindex="0">
-        <h2>Upcoming releases</h2>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
-      <div class="media-row" id="row-upcoming"><p class="small row-loading">Loading live data…</p></div>
+      <form class="search-box" id="search-form">
+        <input type="search" id="search-input" placeholder="Search movies and TV shows" autocomplete="off">
+      </form>
+      <div class="media-row" id="search-results"></div>
     </div>
   </main>
 
-  <script src="assets/site.js"></script>
-  <script src="assets/live-data.js"></script>
+  <script src="../assets/site.js"></script>
+  <script src="../assets/live-data.js"></script>
   <script>
     initNavActiveState();
     initNavOffset();
     initFadeInOnScroll();
-    initSectionHeaders();
-    loadRow("row-trending", "/trending/all/week", "movie");
-    loadRow("row-new-releases", "/movie/now_playing", "movie", "&region=US");
-    loadRow("row-upcoming", "/movie/upcoming", "movie", "&region=US");
+    initSearchBox();
   </script>
 </body>
 </html>

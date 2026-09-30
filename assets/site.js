@@ -7,11 +7,49 @@ function openTestFlight() {
   window.open(TESTFLIGHT_URL, "_blank", "noopener");
 }
 
-// Re-fires the current universal link so iOS can hand off to the app if it's
-// installed (tapping "Open" is what lets Safari re-check, since the very
-// first automatic attempt on page load can be swallowed by the popup blocker).
-function openInVestigo(customSchemeURL) {
+// Only ever called from a button tap — never automatically on page load.
+// Forcing an app-open attempt just for visiting a link is hostile; a person
+// should see the page's own content first and choose to open the app.
+//
+// Tries the vestigo:// custom scheme, then falls back to TestFlight if the
+// app doesn't actually open. Detection: if the app opens, this tab backgrounds
+// (blur/pagehide fires) and we cancel the fallback timer; if nothing happens
+// for ~1.5s, assume the app isn't installed and go to TestFlight instead.
+function openInVestigoWithFallback(customSchemeURL) {
+  let fallbackFired = false;
+  const cancel = () => { fallbackFired = true; };
+  window.addEventListener("blur", cancel, { once: true });
+  window.addEventListener("pagehide", cancel, { once: true });
+
   window.location.href = customSchemeURL;
+
+  setTimeout(() => {
+    if (!fallbackFired) window.location.href = TESTFLIGHT_URL;
+  }, 1500);
+}
+
+// nav.tabs is fixed, so it doesn't reserve space in flow on any page that
+// includes it — measure it and push content down by exactly that much.
+function initNavOffset() {
+  const nav = document.querySelector("nav.tabs");
+  if (!nav) return;
+  const sync = () => { document.body.style.paddingTop = nav.offsetHeight + "px"; };
+  sync();
+  window.addEventListener("resize", sync);
+}
+
+// Every page carries the identical nav markup (no page bakes in its own
+// "active" class), so highlighting the current tab is just a path match —
+// one shared function instead of six near-duplicate copies.
+function initNavActiveState() {
+  const path = location.pathname.replace(/index\.html$/, "");
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    const href = btn.getAttribute("href");
+    if (!href) return;
+    const isActive = href.replace(/index\.html$/, "") === path;
+    btn.classList.toggle("active", isActive);
+    btn.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
 }
 
 function initFadeInOnScroll() {

@@ -80,13 +80,13 @@ function renderRow(containerId) {
   if (header) header.classList.toggle("expanded", state.expanded);
 }
 
-async function loadRow(containerId, path, fallbackKind) {
+async function loadRow(containerId, path, fallbackKind, extraQuery = "") {
   if (rowState[containerId]) return;
   const el = document.getElementById(containerId);
   if (!el) return;
   rowState[containerId] = { items: [], fallbackKind, expanded: false, path };
   try {
-    const items = (await fetchTMDbList(path)).filter((item) => item.media_type !== "person");
+    const items = (await fetchTMDbList(path, extraQuery)).filter((item) => item.media_type !== "person");
     rowState[containerId].items = items;
     renderRow(containerId);
   } catch (err) {
@@ -157,15 +157,4 @@ function initSearchBox() {
     clearTimeout(searchDebounce);
     searchDebounce = setTimeout(() => runSearch(input.value), 400);
   });
-}
-
-// Loads the row(s) for a given tab the first time it's shown, not up front —
-// no point spending a request on data nobody scrolled to.
-function loadDataForPanel(panel) {
-  switch (panel) {
-    case "home": loadRow("row-trending", "/trending/all/week", "movie"); break;
-    case "watchlist": loadRow("row-upcoming", "/movie/upcoming", "movie"); break;
-    case "collections": loadRow("row-popular", "/movie/popular", "movie"); break;
-    default: break;
-  }
 }

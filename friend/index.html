@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=5">
   <meta name="theme-color" content="#000000">
   <meta name="description" content="Add a friend on Vestigo.">
   <title>Add me on Vestigo</title>
@@ -37,9 +37,41 @@
     .divider { display: flex; align-items: center; gap: 10px; color: var(--text-tertiary); font-size: 13px; width: 100%; }
     .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--glass-stroke); }
     #apple-signin { display: flex; justify-content: center; }
+    @media (max-width: 480px) {
+      h1.title { font-size: 22px; }
+    }
   </style>
 </head>
 <body>
+  <nav class="tabs">
+    <div class="tab-bar" role="tablist" aria-label="Vestigo site sections">
+      <a class="tab-btn" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5A1 1 0 0 0 6.5 20.5h11a1 1 0 0 0 1-1V10"/></svg>
+        <span class="label">Home</span>
+      </a>
+      <a class="tab-btn" href="/search/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg>
+        <span class="label">Search</span>
+      </a>
+      <a class="tab-btn" href="/watchlist/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg>
+        <span class="label">Watchlist</span>
+      </a>
+      <a class="tab-btn" href="/collections/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="13" height="9" rx="2"/><path d="M7.5 17.5h13a2 2 0 0 0 2-2V8"/></svg>
+        <span class="label">Collections</span>
+      </a>
+      <a class="tab-btn" href="/settings/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1.5 12h3M19.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+        <span class="label">Settings</span>
+      </a>
+      <a class="tab-btn" href="/download/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 17.5v2A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5v-2"/></svg>
+        <span class="label">Download</span>
+      </a>
+    </div>
+  </nav>
+
   <main class="card-page">
     <img src="../vestigo-app-icon.png" alt="Vestigo" class="app-icon" width="1024" height="1024" style="width: 84px;">
     <div class="glass invite-card fade-in is-visible">
@@ -71,25 +103,25 @@
       return "vestigo://friend" + window.location.search;
     }
 
+    // Only fires on a tap — visiting this page should never force-launch the
+    // app on its own. If the app is installed, iOS intercepts the original
+    // universal link tap before this page even loads.
     document.getElementById("open-app-btn").addEventListener("click", () => {
-      openInVestigo(deepLinkURL());
+      openInVestigoWithFallback(deepLinkURL());
     });
-
-    // If the app is installed, iOS intercepts the universal link tap itself —
-    // this page only ever renders when it isn't, so also try the custom
-    // scheme once automatically in case the AASA hasn't been (re)verified yet.
-    openInVestigo(deepLinkURL());
 
     initAppleSignIn({
       onIdentity: ({ givenName }) => {
         if (givenName) {
           document.getElementById("heading").textContent = `Welcome, ${givenName}`;
         }
-        openInVestigo(deepLinkURL());
+        openInVestigoWithFallback(deepLinkURL());
       },
     });
 
     initFadeInOnScroll();
+    initNavOffset();
+    initNavActiveState();
   </script>
 </body>
 </html>

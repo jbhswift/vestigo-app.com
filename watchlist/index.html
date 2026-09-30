@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=5">
   <meta name="theme-color" content="#000000">
-  <meta name="description" content="Vestigo — a personal movie and TV tracker for iOS. Discover what to watch next, track what you've seen, and get recommendations that reflect your history.">
-  <title>Vestigo — Track what you watch</title>
-  <link rel="icon" type="image/png" href="vestigo-app-icon.png">
-  <link rel="stylesheet" href="assets/site.css">
+  <meta name="description" content="Your watchlist on Vestigo.">
+  <title>Watchlist — Vestigo</title>
+  <link rel="icon" type="image/png" href="../vestigo-app-icon.png">
+  <link rel="stylesheet" href="../assets/site.css">
   <noscript><style>.fade-in { opacity: 1 !important; transform: none !important; }</style></noscript>
   <style>
-    main.wrap { padding-top: 24px; padding-bottom: 40px; }
+    main.wrap { padding-bottom: 40px; }
   </style>
 </head>
 <body>
@@ -44,41 +44,24 @@
   </nav>
 
   <main class="wrap">
-    <div class="feature-group fade-in">
-      <div class="section-header" data-row="row-trending" role="button" tabindex="0">
-        <h2>Trending now</h2>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
-      <div class="media-row" id="row-trending"><p class="small row-loading">Loading live data…</p></div>
+    <div class="panel-intro fade-in">
+      <div class="icon-badge glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg></div>
+      <h1>Watchlist</h1>
+      <p>Everything you save shows up here — ratings, watched dates, and episode progress included.</p>
     </div>
-
     <div class="feature-group fade-in">
-      <div class="section-header" data-row="row-new-releases" role="button" tabindex="0">
-        <h2>New releases</h2>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
-      <div class="media-row" id="row-new-releases"><p class="small row-loading">Loading live data…</p></div>
-    </div>
-
-    <div class="feature-group fade-in">
-      <div class="section-header" data-row="row-upcoming" role="button" tabindex="0">
-        <h2>Upcoming releases</h2>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
-      <div class="media-row" id="row-upcoming"><p class="small row-loading">Loading live data…</p></div>
+      <div class="glass feature-card"><p><strong>Watched &amp; watchlist</strong> — mark movies and series as watched or save them for later.</p></div>
+      <div class="glass feature-card"><p><strong>Ratings</strong> — rate what you've seen from 1–5, with half-star increments.</p></div>
+      <div class="glass feature-card"><p><strong>Episode progress</strong> — track season and episode progress for TV series.</p></div>
+      <div class="glass feature-card"><p><strong>Not interested</strong> — hide items you don't want to see again.</p></div>
     </div>
   </main>
 
-  <script src="assets/site.js"></script>
-  <script src="assets/live-data.js"></script>
+  <script src="../assets/site.js"></script>
   <script>
     initNavActiveState();
     initNavOffset();
     initFadeInOnScroll();
-    initSectionHeaders();
-    loadRow("row-trending", "/trending/all/week", "movie");
-    loadRow("row-new-releases", "/movie/now_playing", "movie", "&region=US");
-    loadRow("row-upcoming", "/movie/upcoming", "movie", "&region=US");
   </script>
 </body>
 </html>

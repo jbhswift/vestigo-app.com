@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=5">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Vestigo settings — content, display, and data.">
+  <title>Settings — Vestigo</title>
+  <link rel="icon" type="image/png" href="../vestigo-app-icon.png">
+  <link rel="stylesheet" href="../assets/site.css">
+  <noscript><style>.fade-in { opacity: 1 !important; transform: none !important; }</style></noscript>
+  <style>
+    main.wrap { padding-bottom: 40px; }
+    .settings-subtabs {
+      display: flex;
+      gap: 6px;
+      margin: 28px 0 4px;
+      border-bottom: 1px solid var(--glass-stroke);
+    }
+    .subtab-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 4px;
+      margin-right: 18px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 200ms ease, border-color 200ms ease;
+    }
+    .subtab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+    .subpanel { display: none; }
+    .subpanel.active { display: block; }
+  </style>
+</head>
+<body>
+  <nav class="tabs">
+    <div class="tab-bar" role="tablist" aria-label="Vestigo site sections">
+      <a class="tab-btn" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5A1 1 0 0 0 6.5 20.5h11a1 1 0 0 0 1-1V10"/></svg>
+        <span class="label">Home</span>
+      </a>
+      <a class="tab-btn" href="/search/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg>
+        <span class="label">Search</span>
+      </a>
+      <a class="tab-btn" href="/watchlist/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg>
+        <span class="label">Watchlist</span>
+      </a>
+      <a class="tab-btn" href="/collections/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="13" height="9" rx="2"/><path d="M7.5 17.5h13a2 2 0 0 0 2-2V8"/></svg>
+        <span class="label">Collections</span>
+      </a>
+      <a class="tab-btn" href="/settings/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1.5 12h3M19.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+        <span class="label">Settings</span>
+      </a>
+      <a class="tab-btn" href="/download/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 17.5v2A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5v-2"/></svg>
+        <span class="label">Download</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <div class="panel-intro fade-in">
+      <div class="icon-badge glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1.5 12h3M19.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></div>
+      <h1>Settings</h1>
+      <p>Fine-tune how Vestigo looks, what it shows, and how your data behaves — all from the app.</p>
+    </div>
+
+    <div class="settings-subtabs" role="tablist" aria-label="Settings sections">
+      <button class="subtab-btn active" data-subpanel="content" role="tab" aria-selected="true">Content</button>
+      <button class="subtab-btn" data-subpanel="display" role="tab" aria-selected="false">Display</button>
+      <button class="subtab-btn" data-subpanel="data" role="tab" aria-selected="false">Data</button>
+    </div>
+
+    <div id="subpanel-content" class="subpanel active">
+      <div class="feature-group fade-in">
+        <div class="glass feature-card"><p><strong>Streaming services</strong> — choose which services you subscribe to; availability results are pinned to the top accordingly.</p></div>
+        <div class="glass feature-card"><p><strong>IMDb or TMDb ratings</strong> — switch rating sources if you've added your own OMDb API key.</p></div>
+        <div class="glass feature-card"><p><strong>Content filters</strong> — prioritise English, hide explicit results, hide anime, reduce kids &amp; family content, hide watched items, hide short films, hide extras &amp; promos, hide upcoming releases.</p></div>
+        <div class="glass feature-card"><p><strong>Watchlist behaviour</strong> — automatically remove watched items from your watchlist, or keep them in a separate "Watched" section.</p></div>
+        <div class="glass feature-card"><p><strong>Rating prompts</strong> — turn off the prompt to rate something right after marking it watched.</p></div>
+        <div class="glass feature-card"><p><strong>Watch dates</strong> — track dates automatically, or set them manually.</p></div>
+        <div class="glass feature-card"><p><strong>Default filters</strong> — set the default Movie/TV/Both filter for each tab.</p></div>
+      </div>
+    </div>
+
+    <div id="subpanel-display" class="subpanel">
+      <div class="feature-group fade-in">
+        <div class="glass feature-card"><p><strong>Light &amp; dark mode</strong> — switch appearance, or follow your system setting.</p></div>
+        <div class="glass feature-card"><p><strong>Accent &amp; background colour</strong> — personalize the app's colour, like the one behind this very page.</p></div>
+        <div class="glass feature-card"><p><strong>Carousel order</strong> — reorder the Home tab's carousels, including the For You recommendations sub-carousels.</p></div>
+      </div>
+    </div>
+
+    <div id="subpanel-data" class="subpanel">
+      <div class="feature-group fade-in">
+        <div class="glass feature-card"><p><strong>Export &amp; import</strong> — back up your watched history as a .csv or .txt file, or import one from Letterboxd.</p></div>
+        <div class="glass feature-card"><p><strong>Hidden items</strong> — review titles you've marked "not interested" or "never show again."</p></div>
+        <div class="glass feature-card"><p><strong>Replay tour</strong> — revisit the first-launch welcome tour anytime.</p></div>
+        <div class="glass feature-card"><p><strong>Clear caches</strong> — free up storage from temporary data (ratings, streaming availability, search results) without touching your watchlist, watched history, ratings, or collections.</p></div>
+        <div class="glass feature-card"><p><strong>Reset</strong> — reset settings and data entirely, if you want a clean start.</p></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../assets/site.js"></script>
+  <script>
+    document.querySelectorAll(".subtab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".subtab-btn").forEach((b) => {
+          b.classList.remove("active");
+          b.setAttribute("aria-selected", "false");
+        });
+        btn.classList.add("active");
+        btn.setAttribute("aria-selected", "true");
+        const target = btn.dataset.subpanel;
+        document.querySelectorAll(".subpanel").forEach((panel) => {
+          panel.classList.toggle("active", panel.id === `subpanel-${target}`);
+        });
+      });
+    });
+
+    initNavActiveState();
+    initNavOffset();
+    initFadeInOnScroll();
+  </script>
+</body>
+</html>
